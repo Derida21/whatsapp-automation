@@ -101,7 +101,7 @@ If you **did not** claim a static domain, this URL will change every time the ng
 ![img](img/session.png)
 4. Create workflow on n8n.
 5. Find Waha Trigger node. Copy test and production url.
-6. Go to your Waha dashboard. Click configuration on your session. Add two Webhooks and paste your test and production url
+6. Go to your Waha dashboard. Click configuration on your session. Add two Webhooks and paste your test and production url.  
 ![img](img/webhooks.png)
 7. Setup waha action on n8n. Find  Waha node (not waha tigger) and create your credential.  
     * host      : `http://waha:3000`
