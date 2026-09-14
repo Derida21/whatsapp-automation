@@ -1,0 +1,62 @@
+version: "3.7"
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_PAYLOAD_SIZE_MAX_MB=50
+      - EDITOR_BASE_URL=${NGROK_DOMAIN}
+      - WEBHOOK_URL=${NGROK_DOMAIN}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${TZ}
+    volumes:
+      - ${N8N_DATA_PATH}:/home/node/.n8n
+    networks:
+      - local_net
+
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - WAHA_PRINT_QR=true
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      - WAHA_DASHBOARD_USERNAME=${WAHA_DASHBOARD_USERNAME}
+      - WAHA_DASHBOARD_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
+      - WHATSAPP_SWAGGER_USERNAME=${WAHA_DASHBOARD_USERNAME}
+      - WHATSAPP_SWAGGER_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
+      - TZ=${TZ}
+    volumes:
+      - ${WAHA_DATA_PATH}:/app/.sessions
+    networks:
+      - local_net
+    depends_on:
+      - n8n
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    restart: unless-stopped
+    command: http --url=${NGROK_STATIC_DOMAIN} n8n:5678
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"
+    networks:
+      - local_net
+    depends_on:
+      - n8n
+
+networks:
+  local_net:
+    driver: bridge
